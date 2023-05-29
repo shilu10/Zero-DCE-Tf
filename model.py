@@ -6,14 +6,14 @@ class ZeroDCENet(keras.Model):
         self.conv_2 = Conv2D(n_filters, (3, 3), strides=(1, 1), activation="relu", padding="same", name="conv_2")
         self.conv_3 = Conv2D(n_filters, (3, 3), strides=(1, 1), activation="relu", padding="same", name="conv_3")
         self.conv_4 = Conv2D(n_filters, (3, 3), strides=(1, 1), activation="relu", padding="same", name="conv_4")
-        self.conv_5 = Conv2D(n_filters, (3, 3), strides=(1, 1), activation="relu", padding="same", name="conv_5")
-        self.conv_6 = Conv2D(n_filters, (3, 3), strides=(1, 1), activation="relu", padding="same", name="conv_6")
+        self.conv_5 = Conv2D(n_filters*2, (3, 3), strides=(1, 1), activation="relu", padding="same", name="conv_5")
+        self.conv_6 = Conv2D(n_filters*2, (3, 3), strides=(1, 1), activation="relu", padding="same", name="conv_6")
         # concatenation layer
         self.concat = Concatenate(axis=-1, name="concat_layer")
         self.A = Conv2D(24, (3, 3), strides=(1, 1), activation="tanh", padding="same", name="curve_params")
         
-    def call(self, inputs):
-        conv_1 = self.conv_1(inputs)
+    def call(self, input_img):
+        conv_1 = self.conv_1(input_img)
         conv_2 = self.conv_2(conv_1)
         conv_3 = self.conv_3(conv_2)
         conv_4 = self.conv_4(conv_3)
@@ -27,12 +27,31 @@ class ZeroDCENet(keras.Model):
         concat_3 = self.concat([conv_6, conv_1])
         A = self.A(concat_3)
         
-        return A
+        enchanced_image = self.gen_enchanced_image(input_img, A)
+        return enchanced_image
     
-    def gen_enchanced_mage(self, curve_params):
+    def gen_enchanced_image(self, input_img, curve_params):
         A = curve_params
+        r1 = A[:,:,:,: 3]
+        r2 = A[:,:,:,3: 6]
+        r3 = A[:,:,:,6: 9]
+        r4 = A[:,:,:,9: 12]
+        r5 = A[:,:,:,12: 15]
+        r6 = A[:,:,:,15: 18]
+        r7 = A[:,:,:,18: 21]
+        r8 = A[:,:,:,21: 24]
         
-    
+        x = input_img + r1 * (tf.pow(input_img,2)-input_img)
+        x = x + r2 * (tf.pow(x,2)-x)
+        x = x + r3 * (tf.pow(x,2)-x)
+        enhanced_image_1 = x + r4*(tf.pow(x,2)-x)
+        x = enhanced_image_1 + r5*(tf.pow(enhanced_image_1,2)-enhanced_image_1)		
+        x = x + r6*(tf.pow(x,2)-x)	
+        x = x + r7*(tf.pow(x,2)-x)
+        enhance_image = x + r8*(tf.pow(x,2)-x)
+        
+        return enhance_image
+
     def summary(self):
         inputs = Input(shape=(256, 256, 3))
         return Model(inputs=inputs, outputs=self.call(inputs)).summary()
