@@ -36,3 +36,23 @@ class ExposureLoss(keras.losses.Loss):
         d = tf.reduce_mean(tf.pow(mean- self.mean_val, 2))
         
         return d
+
+
+class IlluminationSmothnessLoss(keras.losses.Loss):
+    def __init__(self, tvloss_weights=1):
+        super(IlluminationSmothnessLoss, self).__init__()
+        self.tvloss_weights = tvloss_weights
+        
+    def __call__(self, x):
+        super.__call__()
+        batch_size = tf.shape(x)[0]
+        h_x = tf.shape(x)[1]
+        w_x = tf.shape(x)[2]
+        count_h = (tf.shape(x)[2] - 1) * tf.shape(x)[3]
+        count_w = tf.shape(x)[2] * (tf.shape(x)[3] - 1)
+        h_tv = tf.reduce_sum(tf.square((x[:, 1:, :, :] - x[:, : h_x - 1, :, :])))
+        w_tv = tf.reduce_sum(tf.square((x[:, :, 1:, :] - x[:, :, : w_x - 1, :])))
+        batch_size = tf.cast(batch_size, dtype=tf.float32)
+        count_h = tf.cast(count_h, dtype=tf.float32)
+        count_w = tf.cast(count_w, dtype=tf.float32)
+        return 2 * (h_tv / count_h + w_tv / count_w) / batch_size
