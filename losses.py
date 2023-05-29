@@ -21,3 +21,18 @@ class ColorConstancyLoss(keras.losses.Loss):
         
         loss_val = tf.sqrt(diff_rb + diff_rg + diff_gb)
         return loss_val
+
+
+class ExposureLoss(keras.losses.Loss):
+    def __init__(self, mean_val):
+        super(ExposureLoss, self).__init__()
+        self.mean_val = mean_val
+    
+    def __call__(self, image):
+        super.__call__()
+        x = tf.reduce_mean(image, 3, keepdims=True)
+        mean = AveragePooling2D(pool_size=16, strides=16)(x) # non overlap
+        
+        d = tf.reduce_mean(tf.pow(mean- self.mean_val, 2))
+        
+        return d
