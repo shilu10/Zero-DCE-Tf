@@ -152,6 +152,20 @@ class Trainer:
             print(f'train_loss: {train_loss}, exposure_loss: {exposure_loss}, color_constancy_loss: {color_constancy_loss}, illumination_smoothness_loss: {illumination_smoothness_loss}, spatial_consistency_loss: {spatial_consistency_loss}\n')
             print(f'val_loss: {val_loss}, val_exposure_loss: {val_exposure_loss}, val_color_constancy_loss: {val_color_constancy_loss}, val_illumination_smoothness_loss: {val_illumination_smoothness_loss}, val_spatial_consistency_loss: {val_spatial_consistency_loss}\n')
             
+            #reset states of training step
+            self.total_loss_tracker.reset_states()
+            self.exposure_loss_tracker.reset_states()
+            self.color_constancy_loss_tracker.reset_states()
+            self.illumination_smoothness_loss_tracker.reset_states()
+            self.spatial_consistency_loss_tracker.reset_states()
+            
+            # reset states of the val step
+            self.val_total_loss_tracker.reset_states()
+            self.val_exposure_loss_tracker.reset_states()
+            self.val_color_constancy_loss_tracker.reset_states()
+            self.val_illumination_smoothness_loss_tracker.reset_states()
+            self.val_spatial_consistency_loss_tracker.reset_states()
+               
             if epoch %2 == 0: 
                 save_path = self.ckpt_manager.save()
                 
