@@ -1,6 +1,15 @@
+from tensorflow import keras 
+import tensorflow as tf 
+from tensorflow.keras import * 
+import numpy as np 
+import os 
+import shutil 
+import sys 
+import glob 
 
 class Trainer:
-    def __init__(self, model, optimizer, ckpt, ckpt_manager, epochs):
+    def __init__(self, model, optimizer, spatial_consistency_loss, color_constancy_loss,
+                             exposure_loss, illumination_smoothness_loss, ckpt, ckpt_manager, epochs):
         self.model = model 
         self.ckpt = ckpt
         self.ckpt_manager = ckpt_manager
@@ -19,10 +28,10 @@ class Trainer:
         self.val_illumination_smoothness_loss_tracker = keras.metrics.Mean()
         self.val_total_loss_tracker = keras.metrics.Mean()
         
-        self.spatial_consistency_loss_func = SpatialConsistencyLoss()
-        self.color_constancy_loss_func = ColorConstancyLoss()
-        self.exposure_loss_func = ExposureLoss(0.6)
-        self.illumination_smoothness_loss_func = IlluminationSmothnessLoss()
+        self.spatial_consistency_loss_func = spatial_consistency_loss
+        self.color_constancy_loss_func = color_constancy_loss
+        self.exposure_loss_func = exposure_loss
+        self.illumination_smoothness_loss_func = illumination_smoothness_loss
         
         log_dir = 'loss/' + datetime.now().strftime("%Y%m%d-%H%M%S") + '/train'
         self.train_writer = tf.summary.create_file_writer(log_dir)
@@ -91,14 +100,25 @@ class Trainer:
         
         return spatial_constancy_loss, exposure_loss, illumination_loss, color_constancy_loss
     
-    def load_weights(self, filepath):
-        pass 
+    def load_weights(self, filepath="pretrained_weights/zero_dcenet.h5", by_name=False, skip_mismatch=False, options=None):
+        self.model.build((1, 256, 256, 3))
+        self.model.load_weights(
+            filepath=filepath,
+            by_name=by_name,
+            skip_mismatch=skip_mismatch,
+            options=options,
+        ) 
     
-    def save_weights(self, filepath):
-        pass 
+    def save_weights(self, filepath="pretrained_weights/best_model.h5", overwrite=True, save_format=None, options=None):
+        self.model.save_weights(
+            filepath, 
+            overwrite=overwrite,
+            save_format=save_format,
+            options=options
+        ) 
     
     def train(self, train_ds, val_ds):
-        history = defaultdict(list)
+       # history = defaultdict(list)
         
         self.ckpt.restore(self.ckpt_manager.latest_checkpoint)
         if self.ckpt_manager.latest_checkpoint:
@@ -118,23 +138,23 @@ class Trainer:
 
             for step, val_batch in enumerate(val_ds):
                 val_loss_dict = self.test_step(val_batch)
-                val_loss = loss_dict["total_loss"]
-                val_exposure_loss = loss_dict["exposure_loss"]
-                val_color_constancy_loss = loss_dict["color_constancy_loss"]
-                val_illumination_smoothness_loss = loss_dict["illumination_smoothness_loss"]
-                val_spatial_consistency_loss = loss_dict["spatial_consistency_loss"]
+                val_loss = val_loss_dict["total_loss"]
+                val_exposure_loss = val_loss_dict["exposure_loss"]
+                val_color_constancy_loss = val_loss_dict["color_constancy_loss"]
+                val_illumination_smoothness_loss = val_loss_dict["illumination_smoothness_loss"]
+                val_spatial_consistency_loss = val_loss_dict["spatial_consistency_loss"]
         
             self.ckpt.epoch.assign_add(1)
-            history["train_loss"].append(train_loss) 
-            history["val_loss"].append(val_loss) 
-            history["exposure_loss"].append(exposure_loss) 
-            history["val_exposure_loss"].append(val_exposure_loss) 
-            history["color_constancy_loss"].append(color_constancy_loss) 
-            history["val_color_constancy_loss"].append(val_color_constancy_loss) 
-            history["illumination_smoothness_loss"].append(illumination_smoothness_loss) 
-            history["val_illumination_smoothness_loss"].append(val_illumination_smoothness_loss) 
-            history["spatial_consistency_loss"].append(spatial_consistency_loss) 
-            history["val_spatial_consistency_loss"].append(val_spatial_consistency_loss) 
+         #   history["train_loss"].append(train_loss) 
+         #   history["val_loss"].append(val_loss) 
+         #   history["exposure_loss"].append(exposure_loss) 
+         #   history["val_exposure_loss"].append(val_exposure_loss) 
+         #   history["color_constancy_loss"].append(color_constancy_loss) 
+         #   history["val_color_constancy_loss"].append(val_color_constancy_loss) 
+         #   history["illumination_smoothness_loss"].append(illumination_smoothness_loss) 
+         #   history["val_illumination_smoothness_loss"].append(val_illumination_smoothness_loss) 
+         #   history["spatial_consistency_loss"].append(spatial_consistency_loss) 
+         #   history["val_spatial_consistency_loss"].append(val_spatial_consistency_loss) 
         
             with self.train_writer.as_default(step=epoch):
                 tf.summary.scalar('train_loss', train_loss)
@@ -153,26 +173,26 @@ class Trainer:
             print(f'train_loss: {train_loss}, exposure_loss: {exposure_loss}, color_constancy_loss: {color_constancy_loss}, illumination_smoothness_loss: {illumination_smoothness_loss}, spatial_consistency_loss: {spatial_consistency_loss}\n')
             print(f'val_loss: {val_loss}, val_exposure_loss: {val_exposure_loss}, val_color_constancy_loss: {val_color_constancy_loss}, val_illumination_smoothness_loss: {val_illumination_smoothness_loss}, val_spatial_consistency_loss: {val_spatial_consistency_loss}\n')
             
-            #reset states of training step
-            self.total_loss_tracker.reset_states()
-            self.exposure_loss_tracker.reset_states()
-            self.color_constancy_loss_tracker.reset_states()
-            self.illumination_smoothness_loss_tracker.reset_states()
-            self.spatial_consistency_loss_tracker.reset_states()
-            
-            # reset states of the val step
-            self.val_total_loss_tracker.reset_states()
-            self.val_exposure_loss_tracker.reset_states()
-            self.val_color_constancy_loss_tracker.reset_states()
-            self.val_illumination_smoothness_loss_tracker.reset_states()
-            self.val_spatial_consistency_loss_tracker.reset_states()
-               
             if epoch %2 == 0: 
                 save_path = self.ckpt_manager.save()
                 
                 print("Saved checkpoint for step {}: {}".format(int(self.ckpt.epoch), save_path))
             
-        return self.model
+            self.spatial_consistency_loss_tracker.reset_states()
+            self.color_constancy_loss_tracker.reset_states()
+            self.exposure_loss_tracker.reset_states()
+            self.illumination_smoothness_loss_tracker.reset_states()
+            self.total_loss_tracker.reset_states()
+
+            self.val_spatial_consistency_loss_tracker.reset_states()
+            self.val_color_constancy_loss_tracker.reset_states()
+            self.val_exposure_loss_tracker.reset_states()
+            self.val_illumination_smoothness_loss_tracker.reset_states()
+            self.val_total_loss_tracker.reset_states()
+        
+        save_fpath = "pretrained_weights/best_model.h5"
+        self.save_weights(save_fpath)
+        print("Model Weights Serialized at: ", save_fpath)
     
     def compute_psnr(self):
         pass 
