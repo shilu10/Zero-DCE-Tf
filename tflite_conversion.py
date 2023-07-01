@@ -12,9 +12,9 @@ from models import get_zero_dce, ZerodcePlustNet
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--saved_model_path', type=str, default="checkpoint/super_resolution/best_model.h5")
-parser.add_argument('--tflite_model_path', type=str, default='checkpoint/super_resolution/best_model.tflite')
-parser.add_argument('--num_filters', type=int, default=64)
+parser.add_argument('--saved_model_path', type=str, default="pretrained_weights/best_model.h5")
+parser.add_argument('--tflite_model_path', type=str, default='pretrained_weights/best_model.tflite')
+parser.add_argument('--num_filters', type=int, default=32)
 parser.add_argument('--optimize', type=bool, default=False)
 parser.add_argument('--model_type', type=str, default="zerodce")
 
