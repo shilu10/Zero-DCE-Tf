@@ -72,4 +72,4 @@ if __name__ == '__main__':
         model = get_zero_dce(n_filters=args.num_filters)
         model.load_weights(args.model_path)
     
-    test()
+    test(model)
