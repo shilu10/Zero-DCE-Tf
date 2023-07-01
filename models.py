@@ -37,7 +37,7 @@ class ZeroDCENet(keras.Model):
 
         if training:
             return enchanced_image, A 
-            
+
         return enchanced_image
     
     def gen_enchanced_image(self, input_img, curve_params):
@@ -78,10 +78,10 @@ def get_zero_dce(input_shape=(None, None, 3), n_filters=32):
     conv_4 = Conv2D(n_filters, (3, 3), strides=(1, 1), activation="relu", padding="same", name="conv_4")(conv_3)
     concat_1 = Concatenate(axis=-1)([conv_4, conv_3])
  
-    conv_5 = Conv2D(n_filters, (3, 3), strides=(1, 1), activation="relu", padding="same", name="conv_5")(concat_1)
+    conv_5 = Conv2D(n_filters*2, (3, 3), strides=(1, 1), activation="relu", padding="same", name="conv_5")(concat_1)
     concat_2 = Concatenate(axis=-1)([conv_5, conv_2])
     
-    conv_6 = Conv2D(n_filters, (3, 3), strides=(1, 1), activation="relu", padding="same", name="conv_6")(concat_2)
+    conv_6 = Conv2D(n_filters*2, (3, 3), strides=(1, 1), activation="relu", padding="same", name="conv_6")(concat_2)
     concat_3 = Concatenate(axis=-1)([conv_6, conv_1])
     
     A = Conv2D(24, (3, 3), strides=(1, 1), activation="tanh", padding="same", name="curve_params")(concat_3)
