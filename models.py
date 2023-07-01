@@ -108,7 +108,7 @@ def get_zero_dce(input_shape=(None, None, 3), n_filters=32):
 
 
 
-class ZeroDCELiteNet(keras.Model):
+class ZerodcePlustNet(keras.Model):
     def __init__(self, n_filters, input_img_shape=(256, 256, 3)):
         super(ZeroDCELiteNet, self).__init__()
         

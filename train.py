@@ -6,7 +6,7 @@ import sys
 import tensorflow as tf 
 from tensorflow import keras 
 from tensorflow.keras import * 
-from models import ZeroDCENet, ZeroDCELiteNet
+from models import ZeroDCENet, ZerodcePlustNet
 import argparse
 from utils import UnsuuportedFileExtension
 from dataloader import LOLDataLoader
@@ -25,7 +25,7 @@ parser.add_argument('--summary', type=bool, default=False)
 parser.add_argument('--store_model_summary', type=bool, default=False)
 parser.add_argument('--gpu', type=str, default='0')
 parser.add_argument('--resize_dim', type=int, default=256)
-
+parser.add_argument('--model_type', type=str, default="zerodce")
 
 args = parser.parse_args()
 
@@ -45,7 +45,11 @@ def train():
                     transform=False
                 )
     
-    model = ZeroDCENet(args.n_filters)
+    if args.model_type == "zerodce":
+        model = ZeroDCENet(args.n_filters)
+
+    else: 
+        model = ZerodcePlustNet(args.n_filters)
 
     if args.summary:
         model.summary()
