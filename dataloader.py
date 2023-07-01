@@ -134,6 +134,9 @@ class LOLDataLoader:
         if subset == "train":
             tf_ds = tf_ds.batch(batch_size, drop_remainder=True)
 
+        else: 
+            tf_ds = tf_ds.batch(1, drop_remainder=True)
+
         tf_ds = tf_ds.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
         
         return tf_ds

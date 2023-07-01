@@ -18,7 +18,7 @@ class ZeroDCENet(keras.Model):
         self.concat = Concatenate(axis=-1, name="concat_layer")
         self.A = Conv2D(24, (3, 3), strides=(1, 1), activation="tanh", padding="same", name="curve_params")
         
-    def call(self, input_img):
+    def call(self, input_img, training=False):
         conv_1 = self.conv_1(input_img)
         conv_2 = self.conv_2(conv_1)
         conv_3 = self.conv_3(conv_2)
@@ -34,6 +34,10 @@ class ZeroDCENet(keras.Model):
         A = self.A(concat_3)
         
         enchanced_image = self.gen_enchanced_image(input_img, A)
+
+        if training:
+            return enchanced_image, A 
+            
         return enchanced_image
     
     def gen_enchanced_image(self, input_img, curve_params):
