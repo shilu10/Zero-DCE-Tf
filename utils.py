@@ -1,7 +1,7 @@
 import tensorflow as tf 
 import numpy as np 
 from tensorflow import keras 
-
+import cv2 
 
 class UnsuuportedFileExtension(Exception):
     def __init__(self, message):
