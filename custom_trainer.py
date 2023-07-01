@@ -6,7 +6,7 @@ import os
 import shutil 
 import sys 
 import glob 
-
+import datetime 
 
 class Trainer:
     def __init__(self, model, optimizer, spatial_consistency_loss, color_constancy_loss,
@@ -34,10 +34,10 @@ class Trainer:
         self.exposure_loss_func = exposure_loss
         self.illumination_smoothness_loss_func = illumination_smoothness_loss
         
-        log_dir = 'loss/' + datetime.now().strftime("%Y%m%d-%H%M%S") + '/train'
+        log_dir = '/train'
         self.train_writer = tf.summary.create_file_writer(log_dir)
         
-        log_dir = 'loss/' + datetime.now().strftime("%Y%m%d-%H%M%S") + '/val'
+        log_dir = '/val'
         self.val_writer = tf.summary.create_file_writer(log_dir)
     
     def train_step(self, image):
