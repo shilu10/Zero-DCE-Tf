@@ -69,7 +69,7 @@ def test(model):
 if __name__ == '__main__':
     
     if args.model_type == "zerodce":
-        model = get_zero_dce(args.num_filters)
+        model = get_zero_dce(n_filters=args.num_filters)
         model.load_weights(args.model_path)
     
     test()
