@@ -23,7 +23,7 @@ args = parser.parse_args()
 
 def main():
     if args.model_type == "zerodce":
-        model = get_zero_dce(num_filters=args.num_filters)
+        model = get_zero_dce(n_filters=args.num_filters)
 
     if args.model == "zerodce_plus":
         model = ZerodcePlustNet(args.num_filters)
