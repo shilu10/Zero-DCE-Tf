@@ -56,7 +56,7 @@ def test(model):
             
             plt.subplot(122)
             plt.title("Low Resolution Image")
-            plt.imshow(enhanced_image)
+            plt.imshow(enhanced_image[0])
             
             plt.show()
         
