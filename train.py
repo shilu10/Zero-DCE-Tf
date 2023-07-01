@@ -44,7 +44,6 @@ def train():
                     batch_size=args.batch_size,  # by default batch_size=1 for val_ds, even if we specify batch_size=32.
                     transform=False
                 )
-
     
     model = ZeroDCENet(args.n_filters)
 
@@ -80,7 +79,7 @@ def train():
                 spatial_consistency_loss=spatial_consistency_loss, 
                 color_constancy_loss=color_constancy_loss,
                 exposure_loss=exposure_loss, 
-                illumination_smoothness_loss=illumination_smoothness_loss  
+                illumination_smoothness_loss=illumination_smoothness_loss, 
                 ckpt=checkpoint, 
                 ckpt_manager=manager, 
                 epochs=100

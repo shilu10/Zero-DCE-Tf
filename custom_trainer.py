@@ -7,6 +7,7 @@ import shutil
 import sys 
 import glob 
 
+
 class Trainer:
     def __init__(self, model, optimizer, spatial_consistency_loss, color_constancy_loss,
                              exposure_loss, illumination_smoothness_loss, ckpt, ckpt_manager, epochs):
