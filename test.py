@@ -21,7 +21,7 @@ parser.add_argument('--test_data_path', type=str, default='test/LIME/')
 parser.add_argument('--result_data_path', type=str, default='results/LIME/')
 parser.add_argument('--mode', type=str, default="super_resolution")
 parser.add_argument('--file_extension', type=str, default='bmp')
-parser.add_argument('--visualize_result', type=bool, default=False)
+parser.add_argument('--visualize_result', type=bool, default=True)
 parser.add_argument('--model_type', type=str, default='zerodce')
 parser.add_argument('--num_filters', type=int, default=32)
 
