@@ -9,7 +9,7 @@ from tensorflow.keras import *
 from models import ZeroDCENet, ZeroDCELiteNet
 import argparse
 from utils import UnsuuportedFileExtension
-from dataloader import DataLoader
+from dataloader import LOLDataLoader
 from custom_trainer import Trainer
 from losses import IlluminationSmothnessLoss, ExposureLoss, SpatialConsistencyLoss, ColorConstancyLoss
 
