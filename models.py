@@ -110,7 +110,7 @@ def get_zero_dce(input_shape=(None, None, 3), n_filters=32):
 
 class ZerodcePlustNet(keras.Model):
     def __init__(self, n_filters, input_img_shape=(256, 256, 3)):
-        super(ZeroDCELiteNet, self).__init__()
+        super(ZerodcePlustNet, self).__init__()
         
         self.input_img_shape = input_img_shape
         self.depth_conv_1 = SeparableConv2D(
