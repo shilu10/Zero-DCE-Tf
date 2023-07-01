@@ -28,9 +28,6 @@ def main():
     if args.model_type == "zerodce_plus":
         model = ZerodcePlustNet(args.num_filters)
 
-    else:
-        raise 
-
     model.load_weights(args.saved_model_path)
 
     # trained_model = load_model(args.saved_model_path, custom_objects={'tf': tf})
